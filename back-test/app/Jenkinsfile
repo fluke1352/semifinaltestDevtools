@@ -15,5 +15,26 @@ stages {
        }
    }
   
+    stage('Deployment') {
+        steps{
+                withCredentials([string(credentialsId: 'hostip', variable: 'ip'), string(credentialsId: 'username', variable: 'username'), string(credentialsId: 'password', variable: 'pass')]) {
+                script {
+                def remote = [:]
+                remote.name = 'fluke'
+                remote.host = "${ip}"
+                remote.user = "${username}"
+                remote.password = "${pass}"
+                remote.allowAnyHosts = true
+                sshCommand remote: remote, command: "git clone https://github.com/fluke1352/semifinaltestDevtools"
+                sshCommand remote: remote, command: "docker-compose -f semifinaltestDevtools/Docker-compose.yml up -d"
+                sshCommand remote: remote, command: "rm -r semifinaltestDevtools"
+                    
+                }
+          
+               }
+        }      
+    
+    
+    
   }
 }
